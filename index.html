@@ -2,137 +2,64 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0F766E">
-<title>Capstone Kelompok 7 - Event Attendance Universitas Bakrie</title>
+<title>Event Attendance Universitas Bakrie</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --primary:#0F172A;--secondary:#64748B;--tertiary:#0F766E;
-  --surface:#FFFFFF;--border:#E2E8F0;--tint:#F1F5F9;
-  --success:#047857;--warning:#B45309;--info:#0369A1;
-  --r-md:10px;--r-lg:16px;--r-pill:999px;
-}
+:root{--primary:#0F172A;--secondary:#64748B;--tertiary:#0F766E;--surface:#fff;--border:#E2E8F0;--tint:#F1F5F9}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Inter,system-ui,sans-serif;background:var(--tint);color:var(--primary);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 .mono{font-family:'JetBrains Mono',monospace}
 a{color:var(--tertiary);text-decoration:none}
 img{max-width:100%;height:auto}
-.wrap{max-width:1000px;margin:0 auto;padding:clamp(20px,4vw,48px)}
+.wrap{max-width:860px;margin:0 auto;padding:clamp(20px,4vw,48px)}
 
-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;flex-wrap:wrap}
-.logo{width:64px;height:64px;object-fit:contain;flex:0 0 auto}
-header h1{font-size:clamp(20px,3.2vw,28px);font-weight:800;letter-spacing:-.02em;line-height:1.2}
-header p{color:var(--secondary);font-size:clamp(13px,1.6vw,15px);margin-top:4px}
+header{display:flex;align-items:center;gap:16px;margin-bottom:32px;flex-wrap:wrap}
+.logo{width:56px;height:56px;object-fit:contain;flex:0 0 auto}
+header h1{font-size:clamp(19px,3vw,25px);font-weight:800;letter-spacing:-.02em;line-height:1.25}
+header p{color:var(--secondary);font-size:13.5px;margin-top:4px}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:28px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;display:flex;flex-direction:column;gap:8px;transition:.15s}
-.card:hover{border-color:var(--tertiary);transform:translateY(-2px)}
-.card h3{font-size:15.5px;font-weight:700}
-.card p{color:var(--secondary);font-size:13px;flex:1}
-.card .go{font-size:13px;font-weight:700;color:var(--tertiary)}
-
-.section-title{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--secondary);margin:28px 0 12px}
-.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:28px}
-.fact{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px}
-.fact .lab{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--secondary)}
-.fact .val{font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:-.03em;margin-top:4px}
-
-.note{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--warning);border-radius:var(--r-md);padding:14px 16px;font-size:13.5px;color:var(--secondary);margin-bottom:28px}
-.note b{color:var(--primary)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:13.5px;font-weight:600;padding:0 18px;min-height:44px;border-radius:var(--r-md);background:var(--tertiary);color:#fff}
-.btn:hover{background:var(--primary)}
-.btn-ghost{background:var(--surface);color:var(--primary);border:1px solid var(--border)}
-.btn-ghost:hover{background:var(--tint)}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
-footer{text-align:center;color:var(--secondary);font-size:12.5px;padding:20px 0}
+h2{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--secondary);margin:26px 0 10px}
+ul{list-style:none;border-top:1px solid var(--border)}
+li{border-bottom:1px solid var(--border)}
+li a{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:13px 2px;color:var(--primary)}
+li a:hover .t{color:var(--tertiary)}
+li .t{font-weight:600;font-size:14.5px}
+li .d{color:var(--secondary);font-size:13px;text-align:right}
+@media(max-width:560px){li a{flex-direction:column;gap:2px}li .d{text-align:left}}
+footer{color:var(--secondary);font-size:12.5px;padding:28px 0 8px}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header>
-    <img class="logo" src="LOGO_UB.png" alt="Logo Universitas Bakrie">
+    <img class="logo" src="LOGO_UB.png" alt="Universitas Bakrie">
     <div>
       <h1>Event Attendance Universitas Bakrie</h1>
-      <p>Project Capstone Kelompok 7 - Program Studi Informatika - Universitas Bakrie</p>
+      <p>Capstone Kelompok 7 &middot; Informatika</p>
     </div>
   </header>
 
-  <div class="actions">
-    <a class="btn" href="docs/04_prototype_ui.html">Buka Prototype UI</a>
-    <a class="btn btn-ghost" href="docs/01_flowchart.html">Lihat Flowchart</a>
-    <a class="btn btn-ghost" href="docs/03_arsitektur.html">Arsitektur</a>
-  </div>
+  <h2>Dokumen</h2>
+  <ul>
+    <li><a href="docs/04_prototype_ui.html"><span class="t">Prototype UI</span><span class="d">11 layar</span></a></li>
+    <li><a href="docs/01_flowchart.html"><span class="t">Flowchart</span><span class="d">6 diagram</span></a></li>
+    <li><a href="docs/03_arsitektur.html"><span class="t">Arsitektur</span><span class="d">3-tier</span></a></li>
+    <li><a href="docs/02_rencana_sistem.md"><span class="t">Rencana Sistem</span><span class="d">ERD, API, NFR</span></a></li>
+    <li><a href="docs/DESIGN.md"><span class="t">Design System</span><span class="d">token &amp; komponen</span></a></li>
+    <li><a href="docs/theme.css"><span class="t">Token</span><span class="d">Tailwind v4 &amp; DTCG</span></a></li>
+  </ul>
 
-  <div class="facts">
-    <div class="fact"><div class="lab">Fungsional</div><div class="val">14 FR</div></div>
-    <div class="fact"><div class="lab">Non-Fungsional</div><div class="val">8 NFR</div></div>
-    <div class="fact"><div class="lab">Aktor</div><div class="val">4</div></div>
-    <div class="fact"><div class="lab">Uji Otomatis</div><div class="val">77/77</div></div>
-  </div>
+  <h2>Aplikasi</h2>
+  <ul>
+    <li><a href="app/"><span class="t">Kode Sumber</span><span class="d">PHP + MySQL</span></a></li>
+    <li><a href="app/test_suite.sh"><span class="t">Uji Otomatis</span><span class="d">77 skenario</span></a></li>
+  </ul>
 
-  <div class="note">
-    <b>Catatan deploy:</b> ini situs statis (dokumen &amp; prototype). Aplikasi aslinya
-    <b>PHP + MySQL</b> (lihat folder <span class="mono">app/</span>), sehingga perlu hosting PHP
-    seperti XAMPP lokal, cPanel, atau Railway. Vercel hanya menyajikan bagian dokumen ini.
-  </div>
-
-  <div class="section-title">Dokumen Perancangan</div>
-  <div class="grid">
-    <a class="card" href="docs/01_flowchart.html">
-      <h3>Flowchart Sistem</h3>
-      <p>6 diagram alur: alur utama end-to-end, RSVP, presensi QR + fallback, proposal, laporan, state diagram.</p>
-      <span class="go">Buka -&gt;</span>
-    </a>
-    <a class="card" href="docs/02_rencana_sistem.md">
-      <h3>Rencana Sistem</h3>
-      <p>Arsitektur, tech stack, modul, ERD, API, keamanan, NFR, roadmap, dan risiko.</p>
-      <span class="go">Buka -&gt;</span>
-    </a>
-    <a class="card" href="docs/03_arsitektur.html">
-      <h3>Arsitektur 3-Tier</h3>
-      <p>Diagram arsitektur sistem (inline SVG).</p>
-      <span class="go">Buka -&gt;</span>
-    </a>
-    <a class="card" href="docs/DESIGN.md">
-      <h3>Design System</h3>
-      <p>Token warna, tipografi, spacing, dan komponen. Lolos kontras WCAG AA.</p>
-      <span class="go">Buka -&gt;</span>
-    </a>
-    <a class="card" href="docs/04_prototype_ui.html">
-      <h3>Prototype UI</h3>
-      <p>High-fidelity 11 layar: dasbor, acara, scan, proposal, laporan, anggota, email, audit.</p>
-      <span class="go">Buka -&gt;</span>
-    </a>
-    <a class="card" href="docs/theme.css">
-      <h3>Token Ekspor</h3>
-      <p>W3C DTCG (<span class="mono">tokens.dtcg.json</span>) dan Tailwind v4 (<span class="mono">theme.css</span>).</p>
-      <span class="go">Buka -&gt;</span>
-    </a>
-  </div>
-
-  <div class="section-title">Aplikasi</div>
-  <div class="grid">
-    <div class="card">
-      <h3>Kode Sumber</h3>
-      <p>PHP + MySQL di folder <span class="mono">app/</span>: instalasi, 24 halaman, mailer, cron pengingat, migrasi.</p>
-      <span class="go mono">app/</span>
-    </div>
-    <div class="card">
-      <h3>Uji Otomatis</h3>
-      <p>77 skenario end-to-end (RBAC, CSRF, presensi ganda, rate-limit, proposal, email).</p>
-      <span class="go mono">app/test_suite.sh</span>
-    </div>
-    <div class="card">
-      <h3>Menjalankan Lokal</h3>
-      <p>Salin <span class="mono">app/</span> ke <span class="mono">htdocs</span>, lalu buka <span class="mono">install.php</span> dan login dengan akun demo.</p>
-      <span class="go mono">app/README.md</span>
-    </div>
-  </div>
-
-  <footer>Capstone Kelompok 7 - Universitas Bakrie 2026</footer>
+  <footer>Kelompok 7 &middot; Universitas Bakrie</footer>
 </div>
 </body>
 </html>

@@ -70,7 +70,6 @@ Pola: **3-tier web** dengan pemisahan API dan frontend (SPA/SSR), memakai pola *
 | Deployment | Docker + PaaS (Railway/Render) | Reproducible, biaya rendah untuk ormawa. |
 | Monitoring | Uptime check + error tracking | Target uptime 99% jam kampus (NFR-03). |
 
-> Alternatif sesuai SDM: **Laravel + MySQL (XAMPP)** bila tim lebih nyaman PHP; tetap memenuhi seluruh FR/NFR.
 
 ---
 

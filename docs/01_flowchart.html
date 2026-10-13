@@ -37,7 +37,6 @@
   .legend span{display:flex;align-items:center;gap:.4rem;}
   .sw{width:14px;height:14px;border-radius:4px;}
   .hidden{display:none;}
-  footer{text-align:center;color:#475569;font-size:.75rem;margin-top:1rem;}
 </style>
 </head>
 <body>
@@ -58,7 +57,6 @@
   <!-- MAIN -->
   <section class="card flow" data-f="main">
     <h2>1. Alur Utama End-to-End (Panitia → Anggota → Presensi → Rekap)</h2>
-    <p class="desc">Perjalanan lengkap sebuah acara: dibuat panitia, disetujui pembina, dipublikasikan, didaftarkan anggota, dipresensi via QR, lalu direkap otomatis.</p>
     <div class="diagram"><pre class="mermaid">
 flowchart TD
     A([Mulai]) --> B[Panitia login<br/>UC-01 FR-01]
@@ -109,7 +107,6 @@ flowchart TD
   <!-- RSVP -->
   <section class="card flow" data-f="rsvp">
     <h2>2. UC-04 — Pendaftaran / RSVP Acara (FR-04)</h2>
-    <p class="desc">Pre-kondisi: anggota login, acara "Dipublikasikan", kuota belum penuh. Termasuk penanganan kuota penuh &amp; anti-duplikasi.</p>
     <div class="diagram"><pre class="mermaid">
 flowchart TD
     A([Anggota buka Daftar Acara]) --> B[Sistem tampilkan acara<br/>+ sisa kuota]
@@ -132,7 +129,6 @@ flowchart TD
   <!-- CHECKIN -->
   <section class="card flow" data-f="checkin">
     <h2>3. UC-05 — Presensi via QR Code + Mode Cadangan (FR-05, FR-06)</h2>
-    <p class="desc">Panitia memindai QR; sistem memverifikasi keabsahan terhadap acara aktif. QR gagal → kode manual 6 digit. Kode tidak valid/ganda ditolak.</p>
     <div class="diagram"><pre class="mermaid">
 flowchart TD
     A([Panitia buka Scan Presensi]) --> B[Autentikasi panitia pada perangkat<br/>include UC-01]
@@ -160,7 +156,6 @@ flowchart TD
   <!-- PROPOSAL -->
   <section class="card flow" data-f="proposal">
     <h2>4. UC-03 — Pengajuan &amp; Validasi Proposal Acara (FR-03)</h2>
-    <p class="desc">Alur status: Diajukan → Disetujui / Ditolak / Revisi, lengkap dengan stempel waktu dan catatan pembina.</p>
     <div class="diagram"><pre class="mermaid">
 flowchart TD
     A([Panitia siapkan proposal]) --> B[Unggah proposal digital]
@@ -182,7 +177,6 @@ flowchart TD
   <!-- REPORT -->
   <section class="card flow" data-f="report">
     <h2>5. UC-06 — Rekap &amp; Unduh Laporan Kehadiran (FR-07, FR-08, FR-11, FR-12)</h2>
-    <p class="desc">Pengurus/Pembina memfilter, sistem menghitung, lalu menyediakan berkas PDF/Excel/CSV. Filter kosong tidak menghasilkan berkas kosong.</p>
     <div class="diagram"><pre class="mermaid">
 flowchart TD
     A([Pengurus/Pembina buka Laporan Kehadiran]) --> B[Pilih filter<br/>per acara / rentang tanggal / per anggota]
@@ -202,7 +196,6 @@ flowchart TD
   <!-- STATE -->
   <section class="card flow" data-f="state">
     <h2>6. Diagram State — Status Acara &amp; Status Presensi</h2>
-    <p class="desc">Aturan penting: acara yang sudah punya peserta tidak dapat dihapus permanen, hanya dibatalkan (A2). Transaksi presensi bersifat immutable setelah tersimpan (NFR-05).</p>
     <div class="diagram"><pre class="mermaid">
 stateDiagram-v2
     [*] --> Draft
@@ -231,8 +224,6 @@ stateDiagram-v2
     TidakHadir --> [*]
     </pre></div>
   </section>
-
-  <footer>Sumber: SRS_TIF_Project Capstone Kelompok 7 — Universitas Bakrie, 2026</footer>
 </div>
 
 <script>
