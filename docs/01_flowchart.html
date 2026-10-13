@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowchart — Sistem Pengelolaan Acara & Presensi QR Code Ormawa</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root{
+    --bg:#020617; --panel:rgba(15,23,42,.55); --border:#1e293b;
+    --cyan:#22d3ee; --emerald:#34d399; --violet:#a78bfa; --amber:#fbbf24; --rose:#fb7185; --slate:#94a3b8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--bg); color:#e2e8f0; padding:2.5rem 1.5rem; line-height:1.5;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+  header{display:flex;align-items:center;gap:.9rem;margin-bottom:.4rem;}
+  .dot{width:12px;height:12px;border-radius:50%;background:var(--cyan);animation:p 2s infinite;}
+  @keyframes p{0%,100%{opacity:1}50%{opacity:.4}}
+  h1{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;}
+  .sub{color:var(--slate);font-size:.85rem;margin-left:1.8rem;margin-bottom:2rem;}
+  .tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem;}
+  .tab{
+    font-size:.8rem;font-weight:600;padding:.5rem 1rem;border-radius:.6rem;cursor:pointer;
+    background:var(--panel);border:1px solid var(--border);color:var(--slate);transition:.15s;
+  }
+  .tab:hover{color:#fff;border-color:#334155;}
+  .tab.active{color:#020617;background:var(--cyan);border-color:var(--cyan);}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:1rem;padding:1.75rem;margin-bottom:1.5rem;}
+  .card h2{font-size:1.05rem;font-weight:700;margin-bottom:.25rem;color:#fff;}
+  .card .desc{color:var(--slate);font-size:.8rem;margin-bottom:1.25rem;}
+  .diagram{overflow-x:auto;background:#0b1220;border-radius:.75rem;padding:1rem;border:1px solid #16213a;}
+  .mermaid{display:flex;justify-content:center;min-width:560px;}
+  .legend{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem;font-size:.72rem;color:var(--slate);}
+  .legend span{display:flex;align-items:center;gap:.4rem;}
+  .sw{width:14px;height:14px;border-radius:4px;}
+  .hidden{display:none;}
+  footer{text-align:center;color:#475569;font-size:.75rem;margin-top:1rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="dot"></div><h1>Flowchart Sistem Informasi Pengelolaan Acara &amp; Presensi Digital (QR Code)</h1></header>
+  <p class="sub">Organisasi Mahasiswa Universitas Bakrie — Kelompok 7 • diturunkan dari SRS &amp; Use Case (UC-01 … UC-08)</p>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-t="all">Semua</div>
+    <div class="tab" data-t="main">Alur Utama End-to-End</div>
+    <div class="tab" data-t="rsvp">UC-04 Pendaftaran / RSVP</div>
+    <div class="tab" data-t="checkin">UC-05 Presensi QR + Fallback</div>
+    <div class="tab" data-t="proposal">UC-03 Proposal &amp; Persetujuan</div>
+    <div class="tab" data-t="report">UC-06 Rekap &amp; Laporan</div>
+    <div class="tab" data-t="state">State Acara &amp; Presensi</div>
+  </div>
+
+  <!-- MAIN -->
+  <section class="card flow" data-f="main">
+    <h2>1. Alur Utama End-to-End (Panitia → Anggota → Presensi → Rekap)</h2>
+    <p class="desc">Perjalanan lengkap sebuah acara: dibuat panitia, disetujui pembina, dipublikasikan, didaftarkan anggota, dipresensi via QR, lalu direkap otomatis.</p>
+    <div class="diagram"><pre class="mermaid">
+flowchart TD
+    A([Mulai]) --> B[Panitia login<br/>UC-01 FR-01]
+    B --> C[Buat data acara<br/>draft: nama, jenis, tanggal, kuota]
+    C --> D[Ajukan proposal digital<br/>UC-03 FR-03]
+    D --> E{Pembina review}
+    E -- Revisi --> C
+    E -- Ditolak --> Z([Acara dibatalkan])
+    E -- Disetujui --> F[Publikasikan acara<br/>FR-02]
+    F --> G[Notifikasi acara baru<br/>UC-08 FR-10]
+    G --> H[Anggota login & buka Daftar Acara]
+    H --> I[RSVP / daftar acara<br/>UC-04 FR-04]
+    I --> J{Kuota tersedia?}
+    J -- Tidak --> K[Tolak / Waiting List]
+    J -- Ya --> L[Generate QR unik<br/>per peserta per acara]
+    L --> M[Kirim QR + notifikasi konfirmasi]
+    M --> N[Acara berlangsung:<br/>Panitia buka Scan Presensi]
+    N --> O[Anggota tunjukkan QR]
+    O --> P[Scan QR → verifikasi<br/>UC-05 FR-05]
+    P --> Q{QR valid?}
+    Q -- Tidak --> R[Fallback kode manual 6 digit<br/>FR-06]
+    R --> S
+    Q -- Ya --> S[Catat status Hadir<br/>+ stempel waktu immutable]
+    S --> T[Konfirmasi visual nama anggota]
+    T --> U{Acara ditutup?}
+    U -- Belum --> O
+    U -- Ya --> V[Rekap otomatis<br/>UC-06 FR-07]
+    V --> W[Dasbor partisipasi + ekspor<br/>PDF/Excel/CSV FR-08, FR-12]
+    W --> X([Selesai — laporan siap])
+
+    classDef start fill:#0e7490,stroke:#22d3ee,color:#fff;
+    classDef endn fill:#065f46,stroke:#34d399,color:#fff;
+    classDef dec fill:#78350f,stroke:#fbbf24,color:#fff;
+    classDef fail fill:#881337,stroke:#fb7185,color:#fff;
+    class A,X start;
+    class Z fail;
+    class E,J,Q,U dec;
+    class V,W endn;
+    </pre></div>
+    <div class="legend">
+      <span><i class="sw" style="background:#0e7490;border:1px solid #22d3ee"></i>Mulai / Proses kunci</span>
+      <span><i class="sw" style="background:#065f46;border:1px solid #34d399"></i>Selesai / output</span>
+      <span><i class="sw" style="background:#78350f;border:1px solid #fbbf24"></i>Keputusan</span>
+      <span><i class="sw" style="background:#881337;border:1px solid #fb7185"></i>Jalur gagal / batal</span>
+    </div>
+  </section>
+
+  <!-- RSVP -->
+  <section class="card flow" data-f="rsvp">
+    <h2>2. UC-04 — Pendaftaran / RSVP Acara (FR-04)</h2>
+    <p class="desc">Pre-kondisi: anggota login, acara "Dipublikasikan", kuota belum penuh. Termasuk penanganan kuota penuh &amp; anti-duplikasi.</p>
+    <div class="diagram"><pre class="mermaid">
+flowchart TD
+    A([Anggota buka Daftar Acara]) --> B[Sistem tampilkan acara<br/>+ sisa kuota]
+    B --> C[Anggota pilih acara → Daftar]
+    C --> D{Sudah terdaftar?}
+    D -- Ya --> E[Tampilkan QR yang sudah ada<br/>cegah duplikasi A2]
+    E --> H
+    D -- Tidak --> F{Kuota penuh?}
+    F -- Ya --> G[Tawarkan Waiting List<br/>atau pesan kuota penuh A1]
+    G --> H
+    F -- Tidak --> I[Catat sebagai peserta]
+    I --> J[Generate kode/QR unik]
+    J --> K[Kirim notifikasi konfirmasi + QR]
+    K --> H([Anggota menerima QR presensi])
+    classDef dec fill:#78350f,stroke:#fbbf24,color:#fff;
+    class F,D dec;
+    </pre></div>
+  </section>
+
+  <!-- CHECKIN -->
+  <section class="card flow" data-f="checkin">
+    <h2>3. UC-05 — Presensi via QR Code + Mode Cadangan (FR-05, FR-06)</h2>
+    <p class="desc">Panitia memindai QR; sistem memverifikasi keabsahan terhadap acara aktif. QR gagal → kode manual 6 digit. Kode tidak valid/ganda ditolak.</p>
+    <div class="diagram"><pre class="mermaid">
+flowchart TD
+    A([Panitia buka Scan Presensi]) --> B[Autentikasi panitia pada perangkat<br/>include UC-01]
+    B --> C[Anggota tunjukkan QR]
+    C --> D[Panitia pindai QR via kamera]
+    D --> E{QR terbaca?}
+    E -- Tidak --> F[Input kode manual 6 digit<br/>FR-06 mode cadangan]
+    F --> G
+    E -- Ya --> G[Verifikasi keabsahan kode<br/>vs acara aktif]
+    G --> H{Kode valid & belum dipakai?}
+    H -- Tidak --> I[Tolak pencatatan ganda<br/>+ peringatan A2]
+    I --> C
+    H -- Ya --> J[Catat status Hadir<br/>+ stempel waktu]
+    J --> K[Konfirmasi visual nama anggota]
+    K --> L{Lanjut peserta lain?}
+    L -- Ya --> C
+    L -- Tidak --> M([Selesai sesi presensi])
+    classDef dec fill:#78350f,stroke:#fbbf24,color:#fff;
+    classDef fail fill:#881337,stroke:#fb7185,color:#fff;
+    class E,H,L dec;
+    class I fail;
+    </pre></div>
+  </section>
+
+  <!-- PROPOSAL -->
+  <section class="card flow" data-f="proposal">
+    <h2>4. UC-03 — Pengajuan &amp; Validasi Proposal Acara (FR-03)</h2>
+    <p class="desc">Alur status: Diajukan → Disetujui / Ditolak / Revisi, lengkap dengan stempel waktu dan catatan pembina.</p>
+    <div class="diagram"><pre class="mermaid">
+flowchart TD
+    A([Panitia siapkan proposal]) --> B[Unggah proposal digital]
+    B --> C[Status: Diajukan<br/>+ timestamp]
+    C --> D[Notifikasi ke Pembina]
+    D --> E{Pembina meninjau}
+    E -- Setuju --> F[Status: Disetujui<br/>acara boleh dipublikasikan]
+    E -- Revisi --> G[Status: Revisi + catatan]
+    G --> B
+    E -- Tolak --> H[Status: Ditolak + alasan]
+    H --> I([Acara tidak dipublikasikan])
+    F --> J([Acara siap tayang ke anggota])
+    classDef dec fill:#78350f,stroke:#fbbf24,color:#fff;
+    classDef fail fill:#881337,stroke:#fb7185,color:#fff;
+    class E dec; class H,I fail;
+    </pre></div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="card flow" data-f="report">
+    <h2>5. UC-06 — Rekap &amp; Unduh Laporan Kehadiran (FR-07, FR-08, FR-11, FR-12)</h2>
+    <p class="desc">Pengurus/Pembina memfilter, sistem menghitung, lalu menyediakan berkas PDF/Excel/CSV. Filter kosong tidak menghasilkan berkas kosong.</p>
+    <div class="diagram"><pre class="mermaid">
+flowchart TD
+    A([Pengurus/Pembina buka Laporan Kehadiran]) --> B[Pilih filter<br/>per acara / rentang tanggal / per anggota]
+    B --> C[Klik Unduh Laporan]
+    C --> D{Ada data?}
+    D -- Tidak --> E[Pesan 'Data tidak ditemukan'<br/>tanpa berkas kosong A1]
+    E --> B
+    D -- Ya --> F[Hitung ringkasan<br/>hadir / tidak hadir / %]
+    F --> G[Generate berkas<br/>PDF / Excel / CSV]
+    G --> H[Taut unduh tersedia]
+    H --> I([Laporan siap dilaporkan<br/>ke kemahasiswaan/SKPI])
+    classDef dec fill:#78350f,stroke:#fbbf24,color:#fff;
+    class D dec;
+    </pre></div>
+  </section>
+
+  <!-- STATE -->
+  <section class="card flow" data-f="state">
+    <h2>6. Diagram State — Status Acara &amp; Status Presensi</h2>
+    <p class="desc">Aturan penting: acara yang sudah punya peserta tidak dapat dihapus permanen, hanya dibatalkan (A2). Transaksi presensi bersifat immutable setelah tersimpan (NFR-05).</p>
+    <div class="diagram"><pre class="mermaid">
+stateDiagram-v2
+    [*] --> Draft
+    Draft --> Diajukan: ajukan proposal
+    Diajukan --> Disetujui: pembina setuju
+    Diajukan --> Revisi: minta revisi
+    Revisi --> Diajukan: perbaiki & kirim ulang
+    Diajukan --> Ditolak: pembina tolak
+    Disetujui --> Dipublikasikan: tayang ke anggota
+    Dipublikasikan --> Berlangsung: jendela presensi dibuka
+    Berlangsung --> Ditutup: akhiri presensi
+    Dipublikasikan --> Dibatalkan: ada peserta → batal + alasan
+    Berlangsung --> Dibatalkan: batal darurat + alasan
+    Ditutup --> [*]
+    Ditolak --> [*]
+    Dibatalkan --> [*]
+    </pre></div>
+    <div class="diagram" style="margin-top:1rem;"><pre class="mermaid">
+stateDiagram-v2
+    [*] --> Terdaftar: RSVP sukses + QR dibuat
+    Terdaftar --> Hadir: QR valid dipindai
+    Terdaftar --> HadirCadangan: kode manual 6 digit valid
+    Terdaftar --> TidakHadir: acara ditutup tanpa presensi
+    Hadir --> [*]: immutable (stempel waktu)
+    HadirCadangan --> [*]: ditandai 'mode cadangan'
+    TidakHadir --> [*]
+    </pre></div>
+  </section>
+
+  <footer>Sumber: SRS_TIF_Project Capstone Kelompok 7 — Universitas Bakrie, 2026</footer>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad:true,
+    theme:'dark',
+    themeVariables:{
+      primaryColor:'#0e7490', primaryTextColor:'#fff', primaryBorderColor:'#22d3ee',
+      lineColor:'#64748b', secondaryColor:'#1e293b', tertiaryColor:'#0b1220',
+      fontFamily:'Inter, sans-serif', fontSize:'13px'
+    },
+    flowchart:{curve:'basis', htmlLabels:true, padding:12},
+    securityLevel:'loose'
+  });
+
+  const tabs=document.querySelectorAll('.tab');
+  const flows=document.querySelectorAll('.flow');
+  tabs.forEach(t=>t.addEventListener('click',()=>{
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const f=t.dataset.t;
+    flows.forEach(fl=>{
+      fl.classList.toggle('hidden', f!=='all' && fl.dataset.f!==f);
+    });
+  }));
+</script>
+</body>
+</html>

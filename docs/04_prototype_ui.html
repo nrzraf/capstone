@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F766E">
+<title>Prototype UI - Event Attendance Universitas Bakrie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#0F172A;--secondary:#64748B;--tertiary:#0F766E;
+  --neutral:#F8FAFC;--surface:#FFFFFF;--border:#E2E8F0;
+  --success:#047857;--warning:#B45309;--danger:#BE123C;--info:#0369A1;
+  --r-sm:6px;--r-md:10px;--r-lg:16px;--r-pill:999px;
+  --sh2:0 8px 24px rgba(15,23,42,.16);--tint:#F1F5F9;--sidebar:250px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font-family:Inter,system-ui,sans-serif;background:var(--tint);color:var(--primary);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+a{color:var(--tertiary);text-decoration:none}
+img{max-width:100%;height:auto}
+
+.layout{display:grid;grid-template-columns:var(--sidebar) minmax(0,1fr);min-height:100vh}
+.side{background:var(--surface);border-right:1px solid var(--border);padding:18px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:40}
+.main{padding:clamp(16px,2.4vw,30px);width:100%;max-width:1280px;min-width:0}
+
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 16px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.logo{width:38px;height:38px;object-fit:contain;flex:0 0 auto;display:block}
+.brand b{font-size:14px;line-height:1.2;display:block}
+
+.nav-sec{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:12px 12px 5px}
+.nav-a{display:block;padding:11px 12px;border-radius:var(--r-md);color:var(--secondary);font-size:14px;font-weight:600;transition:.15s;cursor:pointer}
+.nav-a:hover{background:var(--tint);color:var(--primary)}
+.nav-a.active{background:var(--tertiary);color:#fff}
+
+.appbar{display:none}
+.menu-btn{width:44px;height:44px;border-radius:var(--r-md);display:grid;place-items:center;background:var(--surface);border:1px solid var(--border)}
+.bars,.bars:before,.bars:after{display:block;width:18px;height:2px;background:var(--primary);border-radius:2px;content:""}
+.bars{position:relative}
+.bars:before{position:absolute;top:-6px}
+.bars:after{position:absolute;top:6px}
+.backdrop{display:none}
+
+@media(max-width:1023px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .appbar{display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px}
+  .appbar .logo{width:32px;height:32px}
+  .appbar b{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .appbar .spacer{flex:1}
+  .side{position:fixed;top:0;left:0;height:100dvh;width:min(82vw,300px);transform:translateX(-104%);transition:transform .24s ease;box-shadow:var(--sh2)}
+  body.nav-open .side{transform:translateX(0)}
+  body.nav-open .backdrop{display:block;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:35}
+  .side .close-x{margin-left:auto;width:36px;height:36px;border-radius:var(--r-md);display:grid;place-items:center;color:var(--secondary);font-size:20px}
+}
+@media(min-width:1024px){.side .close-x{display:none}}
+
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.userchip{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:6px 14px 6px 6px;max-width:100%}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;flex:0 0 auto}
+.userchip b{font-size:13px}.userchip small{display:block;color:var(--secondary);font-size:11px;line-height:1.1}
+.userchip .txt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.page-title{font-size:clamp(19px,2.6vw,24px);font-weight:800;letter-spacing:-.02em}
+.page-sub{color:var(--secondary);font-size:clamp(12px,1.5vw,13.5px);margin-top:3px}
+h3{font-size:clamp(14.5px,1.9vw,16px);font-weight:700}
+
+.grid{display:grid;gap:14px;min-width:0}
+.col-2{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr)}
+.col-2e{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.col-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.col-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:900px){.col-2,.col-2e,.col-3,.col-4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.col-2,.col-2e,.col-3,.col-4{grid-template-columns:minmax(0,1fr)}}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:clamp(16px,2.4vw,22px)}
+.grid>.card{margin-top:0}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sub{color:var(--secondary);font-size:clamp(11.5px,1.4vw,13px);margin-top:2px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px}
+.kpi .lab{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--secondary)}
+.kpi .val{font-size:clamp(22px,3vw,29px);font-weight:800;letter-spacing:-.03em;margin-top:6px}
+.kpi .delta{font-size:12px;font-weight:600;margin-top:4px;color:var(--secondary)}
+.up{color:var(--success)}.down{color:var(--danger)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:13.5px;font-weight:600;padding:0 16px;min-height:44px;border-radius:var(--r-md);transition:.15s;white-space:nowrap}
+.btn-primary{background:var(--tertiary);color:#fff}.btn-primary:hover{background:var(--primary)}
+.btn-ghost{background:var(--surface);color:var(--primary);border:1px solid var(--border)}.btn-ghost:hover{background:var(--tint)}
+.btn-sm{min-height:38px;padding:0 13px;font-size:12.5px}
+.btn-block{width:100%}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+@media(max-width:480px){.btn{width:100%}.btn-sm{width:auto}}
+
+.table-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.table-scroll table{min-width:520px}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--secondary);text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{font-size:13.5px;padding:12px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+th.num,td.num{text-align:right}
+.muted{color:var(--secondary)}
+@media(max-width:640px){th,td{padding:9px 8px;font-size:12.5px}}
+
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:5px 10px;border-radius:var(--r-pill);color:#fff;text-transform:uppercase;white-space:nowrap}
+.b-present{background:var(--success)}.b-absent{background:var(--danger)}
+.b-fallback{background:var(--warning)}.b-info{background:var(--info)}
+.b-muted{background:var(--tint);color:var(--secondary)}
+
+label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}
+input,select,textarea{width:100%;font-family:inherit;font-size:16px;color:var(--primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:11px 12px;outline:none;transition:.15s}
+input:focus,select:focus,textarea:focus{border-color:var(--tertiary);box-shadow:0 0 0 3px rgba(15,118,110,.15)}
+.field{margin-bottom:14px}
+.hint{font-size:12px;color:var(--secondary);margin-top:5px}
+
+.chip{font-size:11px;font-weight:700;color:var(--secondary);background:var(--tint);padding:4px 10px;border-radius:var(--r-pill);white-space:nowrap}
+.bar{height:8px;background:var(--tint);border-radius:var(--r-pill);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--tertiary);border-radius:var(--r-pill)}
+.empty{text-align:center;color:var(--secondary);padding:36px 10px;font-size:14px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.row .meta{color:var(--secondary);font-size:12.5px;margin-top:2px}
+
+.scan-stage{background:var(--primary);border-radius:var(--r-lg);padding:26px;color:#fff;display:flex;flex-direction:column;align-items:center;gap:16px}
+.viewfinder{width:min(340px,80%);aspect-ratio:1;border-radius:20px;background:linear-gradient(160deg,#1e293b,#0b1220);position:relative;display:grid;place-items:center}
+.viewfinder .corner{position:absolute;width:34px;height:34px;border:3px solid #2dd4bf;border-radius:8px}
+.c-tl{top:16px;left:16px;border-right:none;border-bottom:none}.c-tr{top:16px;right:16px;border-left:none;border-bottom:none}
+.c-bl{bottom:16px;left:16px;border-right:none;border-top:none}.c-br{bottom:16px;right:16px;border-left:none;border-top:none}
+.scanline{position:absolute;left:10%;right:10%;height:2px;background:#2dd4bf;box-shadow:0 0 12px #2dd4bf;animation:scan 2.2s ease-in-out infinite}
+@keyframes scan{0%,100%{top:18%}50%{top:80%}}
+.qr-ghost{width:120px;height:120px;opacity:.35;background:repeating-linear-gradient(90deg,#334155 0 8px,#0b1220 8px 16px),repeating-linear-gradient(0deg,#334155 0 8px,transparent 8px 16px);border-radius:8px}
+.scan-result{width:100%;max-width:420px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:var(--r-md);padding:16px;display:flex;align-items:center;gap:14px}
+.scan-result .ok{width:40px;height:40px;border-radius:50%;background:var(--success);display:grid;place-items:center;font-size:20px;flex:0 0 auto}
+.fallback-box{border:1px dashed var(--warning);border-radius:var(--r-md);padding:14px;background:#FFFBEB}
+
+.login-wrap{max-width:400px;margin:40px auto}
+.login-brand{text-align:center;margin-bottom:22px}
+.login-brand .logo{width:64px;height:64px;margin:0 auto 12px}
+.qr-box{width:190px;height:190px;border:1px solid var(--border);border-radius:12px;background:repeating-linear-gradient(90deg,#0F172A 0 10px,transparent 10px 20px),repeating-linear-gradient(0deg,#0F172A 0 10px,transparent 10px 20px);opacity:.9}
+
+.screen{display:none}
+.screen.active{display:block}
+</style>
+</head>
+<body>
+
+<div class="appbar">
+  <button class="menu-btn" onclick="toggleNav()" aria-label="Menu"><span class="bars"></span></button>
+  <img class="logo" src="LOGO_UB.png" alt="Logo Universitas Bakrie">
+  <b id="appbar-title">Dasbor</b>
+  <span class="spacer"></span>
+  <div class="avatar">R</div>
+</div>
+<div class="backdrop" onclick="toggleNav()"></div>
+
+<div class="layout">
+  <aside class="side">
+    <div class="brand">
+      <img class="logo" src="LOGO_UB.png" alt="Logo Universitas Bakrie">
+      <div><b>Event Attendance Universitas Bakrie</b></div>
+      <button class="close-x" onclick="toggleNav()" aria-label="Tutup">&#215;</button>
+    </div>
+
+    <div class="nav-sec">Utama</div>
+    <a class="nav-a active" data-s="dashboard">Dasbor</a>
+    <a class="nav-a" data-s="events">Acara</a>
+    <a class="nav-a" data-s="notif">Notifikasi</a>
+
+    <div class="nav-sec">Panitia</div>
+    <a class="nav-a" data-s="form">Buat Acara</a>
+    <a class="nav-a" data-s="scan">Scan Presensi</a>
+    <a class="nav-a" data-s="proposal">Proposal</a>
+    <a class="nav-a" data-s="report">Laporan</a>
+
+    <div class="nav-sec">Admin</div>
+    <a class="nav-a" data-s="members">Anggota</a>
+    <a class="nav-a" data-s="mail">Email</a>
+    <a class="nav-a" data-s="audit">Audit</a>
+
+    <div style="flex:1"></div>
+    <a class="nav-a" data-s="login">Keluar</a>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div style="min-width:0">
+        <div class="page-title" id="page-title">Dasbor</div>
+      </div>
+      <div class="userchip">
+        <div class="avatar">R</div>
+        <div class="txt"><b>Rafi Ibnusalis</b><small>Panitia · Sie Acara</small></div>
+      </div>
+    </div>
+
+    <!-- LOGIN -->
+    <section class="screen" id="s-login">
+      <div class="login-wrap">
+        <div class="card">
+          <div class="login-brand">
+            <img class="logo" src="LOGO_UB.png" alt="Logo Universitas Bakrie">
+            <h3 style="font-size:19px">Event Attendance Universitas Bakrie</h3>
+            <p class="sub">Masuk untuk melanjutkan</p>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" placeholder="nama@student.bakrie.ac.id">
+          </div>
+          <div class="field">
+            <label>Kata Sandi</label>
+            <input type="password" placeholder="********">
+          </div>
+          <button class="btn btn-primary btn-block">Masuk</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASBOR -->
+    <section class="screen active" id="s-dashboard">
+      <div class="grid col-4" style="margin-bottom:16px">
+        <div class="kpi"><div class="lab">Total Acara</div><div class="val">3</div><div class="delta">aktif &amp; selesai</div></div>
+        <div class="kpi"><div class="lab">Rata-rata Kehadiran</div><div class="val">43%</div><div class="delta up">dari 7 pendaftaran</div></div>
+        <div class="kpi"><div class="lab">Anggota Aktif</div><div class="val">7</div><div class="delta">terdaftar</div></div>
+        <div class="kpi"><div class="lab">Total Presensi</div><div class="val">3</div><div class="delta">tercatat</div></div>
+      </div>
+
+      <div class="grid col-2e">
+        <div class="card">
+          <div class="card-head"><h3>Acara Terbaru</h3></div>
+          <div class="table-scroll">
+          <table>
+            <thead><tr><th>Acara</th><th>Status</th><th>Tanggal</th><th class="num">Hadir</th><th class="num">Daftar</th><th class="num">%</th></tr></thead>
+            <tbody>
+              <tr><td><b>Pengabdian Masyarakat Desa</b><div class="sub">Pengabdian</div></td><td><span class="badge b-muted">Draft</span></td><td class="muted">25 Mei 2026</td><td class="num mono">0</td><td class="num mono">0</td><td class="num mono">0%</td></tr>
+              <tr><td><b>Rapat Kerja Tahunan</b><div class="sub">Rapat Kerja</div></td><td><span class="badge b-info">Dipublikasikan</span></td><td class="muted">20 Mei 2026</td><td class="num mono">1</td><td class="num mono">2</td><td class="num mono">50%</td></tr>
+              <tr><td><b>Pelatihan Manajemen Organisasi</b><div class="sub">Pelatihan</div></td><td><span class="badge b-info">Dipublikasikan</span></td><td class="muted">18 Mei 2026</td><td class="num mono">1</td><td class="num mono">3</td><td class="num mono">33%</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Anggota Teraktif</h3></div>
+          <div class="row"><div><b>Siti Aminah</b><div class="meta">Humas</div></div><div style="width:42%"><div class="bar"><i style="width:33%"></i></div><div class="sub mono" style="text-align:right">33%</div></div></div>
+          <div class="row"><div><b>Andi Pratama</b><div class="meta">Acara</div></div><div style="width:42%"><div class="bar"><i style="width:50%"></i></div><div class="sub mono" style="text-align:right">50%</div></div></div>
+          <div class="row"><div><b>Rafi Ibnusalis</b><div class="meta">IT/PSDM</div></div><div style="width:42%"><div class="bar"><i style="width:100%"></i></div><div class="sub mono" style="text-align:right">100%</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACARA -->
+    <section class="screen" id="s-events">
+      <div class="grid col-2">
+        <div class="card">
+          <div class="card-head"><h3>Acara Tersedia</h3><input style="width:180px" placeholder="Cari acara"></div>
+          <div class="table-scroll">
+          <table>
+            <thead><tr><th>Acara</th><th>Status</th><th>Jadwal</th><th>Lokasi</th><th class="num">Kuota</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><b>Seminar Nasional Kepemimpinan</b><div class="sub">Seminar</div></td><td><span class="badge b-info">Dipublikasikan</span></td><td class="muted">12 Mei 2026<br><span class="mono">09:00</span></td><td class="muted">Aula Utama</td><td class="num mono">142/150</td><td class="num"><a class="btn btn-ghost btn-sm">Lihat QR</a></td></tr>
+              <tr><td><b>Pelatihan Manajemen Organisasi</b><div class="sub">Pelatihan</div></td><td><span class="badge b-info">Dipublikasikan</span></td><td class="muted">18 Mei 2026<br><span class="mono">13:00</span></td><td class="muted">Ruang 302</td><td class="num mono">88/100</td><td class="num"><a class="btn btn-primary btn-sm">Daftar</a></td></tr>
+              <tr><td><b>Rapat Kerja Tahunan</b><div class="sub">Rapat Kerja</div></td><td><span class="badge b-info">Dipublikasikan</span></td><td class="muted">20 Mei 2026<br><span class="mono">08:00</span></td><td class="muted">Ruang Rapat</td><td class="num mono">80/80</td><td class="num"><button class="btn btn-ghost btn-sm" disabled>Kuota Penuh</button></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>QR Presensi</h3><span class="badge b-present">Terdaftar</span></div>
+          <div style="display:grid;place-items:center;padding:18px 0">
+            <div class="qr-box"></div>
+            <p class="hint" style="margin-top:12px">Tunjukkan QR ini ke panitia</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTIFIKASI -->
+    <section class="screen" id="s-notif">
+      <div class="card">
+        <div class="card-head"><h3>Notifikasi</h3></div>
+        <div class="row"><div><b>Acara baru: Seminar Nasional Kepemimpinan</b><div class="meta">acara_baru · 10/05/2026 08:12</div></div><span class="badge b-info">Baru</span></div>
+        <div class="row"><div><b>Pendaftaran dikonfirmasi</b><div class="meta">konfirmasi · 10/05/2026 08:20</div></div><span class="badge b-info">Baru</span></div>
+        <div class="row"><div><b>Pengingat H-1: Pelatihan Manajemen Organisasi</b><div class="meta">pengingat · 17/05/2026 07:00</div></div></div>
+      </div>
+    </section>
+
+    <!-- SCAN -->
+    <section class="screen" id="s-scan">
+      <div class="grid col-2">
+        <div class="scan-stage">
+          <div class="viewfinder">
+            <span class="corner c-tl"></span><span class="corner c-tr"></span><span class="corner c-bl"></span><span class="corner c-br"></span>
+            <div class="qr-ghost"></div>
+            <div class="scanline"></div>
+          </div>
+          <div class="scan-result">
+            <div class="ok">&#10003;</div>
+            <div><b>Budi Santoso</b><div style="font-size:12px;color:#94a3b8">NIM 1232001006</div></div>
+            <div style="margin-left:auto;text-align:right"><div class="badge b-present">Hadir</div><div class="mono" style="font-size:11px;color:#94a3b8;margin-top:5px">09:14:07</div></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-head"><h3>Sesi Berjalan</h3><span class="badge b-info">Live</span></div>
+            <div class="grid col-3">
+              <div><b class="mono" style="font-size:22px">142</b><div class="meta">Hadir via QR</div></div>
+              <div><b class="mono" style="font-size:22px">3</b><div class="meta">Mode cadangan</div></div>
+              <div><b class="mono" style="font-size:22px">150</b><div class="meta">Total terdaftar</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Mode Cadangan</h3></div>
+            <div class="fallback-box">
+              <label>Kode manual 6 digit</label>
+              <div style="display:flex;gap:8px">
+                <input class="mono" style="letter-spacing:.35em;text-align:center;font-size:18px" value="482913" maxlength="6">
+                <button class="btn btn-primary">Catat</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUAT ACARA -->
+    <section class="screen" id="s-form">
+      <div class="grid col-2">
+        <div class="card">
+          <div class="field"><label>Nama Acara</label><input value="Seminar Nasional Kepemimpinan Mahasiswa"></div>
+          <div class="grid col-2e">
+            <div class="field"><label>Jenis Acara</label>
+              <select><option>Seminar</option><option>Pelatihan</option><option>Rapat Kerja</option><option>Pelantikan</option></select>
+            </div>
+            <div class="field"><label>Kuota Peserta</label><input class="mono" value="150"></div>
+          </div>
+          <div class="grid col-2e">
+            <div class="field"><label>Tanggal</label><input type="date" value="2026-05-12"></div>
+            <div class="field"><label>Waktu</label><input type="time" value="09:00"></div>
+          </div>
+          <div class="field"><label>Lokasi</label><input value="Aula Utama Universitas Bakrie"></div>
+          <div class="field"><label>Deskripsi</label><textarea rows="3">Seminar kepemimpinan untuk pengurus dan anggota ormawa.</textarea></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary">Simpan sebagai Draft</button>
+            <button class="btn btn-ghost">Simpan &amp; Publikasikan</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Status Acara</h3><span class="badge b-muted">Draft</span></div>
+          <div class="row"><span>Nama acara</span><span class="badge b-present">OK</span></div>
+          <div class="row"><span>Tanggal &amp; waktu</span><span class="badge b-present">OK</span></div>
+          <div class="row"><span>Kuota</span><span class="badge b-present">OK</span></div>
+          <div class="row"><span>Deskripsi</span><span class="badge b-fallback">Opsional</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROPOSAL -->
+    <section class="screen" id="s-proposal">
+      <div class="grid col-2">
+        <div class="card">
+          <div class="card-head"><h3>Ajukan Proposal</h3></div>
+          <div class="field"><label>Judul Proposal</label><input value="Proposal Seminar Nasional Kepemimpinan"></div>
+          <div class="field"><label>Ringkasan</label><textarea rows="3">Tujuan, sasaran, dan gambaran kegiatan.</textarea></div>
+          <div class="field"><label>Berkas Proposal</label><input type="file"></div>
+          <button class="btn btn-primary">Ajukan</button>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Tinjau Proposal</h3><span class="badge b-fallback">Revisi</span></div>
+          <div class="row"><span>Pengaju</span><b>Rafi Ibnusalis</b></div>
+          <div class="row"><span>Acara</span><b>Seminar Nasional Kepemimpinan</b></div>
+          <div class="field" style="margin-top:14px"><label>Catatan (wajib untuk revisi/tolak)</label><textarea rows="2">Anggaran perlu dilampirkan.</textarea></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary">Setujui</button>
+            <button class="btn btn-ghost">Revisi</button>
+            <button class="btn btn-ghost">Tolak</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAPORAN -->
+    <section class="screen" id="s-report">
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end">
+            <div><label>Filter</label><select style="min-width:180px"><option>Seminar Nasional Kepemimpinan</option><option>Semua Acara</option></select></div>
+            <div><label>Format</label><select style="min-width:140px"><option>PDF</option><option>Excel (.xls)</option><option>CSV</option></select></div>
+          </div>
+          <button class="btn btn-primary">Unduh Laporan</button>
+        </div>
+
+        <div class="grid col-4" style="margin-bottom:18px">
+          <div class="kpi"><div class="lab">Hadir</div><div class="val mono" style="font-size:24px">142</div></div>
+          <div class="kpi"><div class="lab">Tidak Hadir</div><div class="val mono" style="font-size:24px">8</div></div>
+          <div class="kpi"><div class="lab">Mode Cadangan</div><div class="val mono" style="font-size:24px">3</div></div>
+          <div class="kpi"><div class="lab">Persentase</div><div class="val mono" style="font-size:24px">94,6%</div></div>
+        </div>
+
+        <div class="table-scroll">
+        <table>
+          <thead><tr><th>Nama</th><th>NIM</th><th>Divisi</th><th>Status</th><th class="num">Check-in</th></tr></thead>
+          <tbody>
+            <tr><td>Budi Santoso</td><td class="mono">1232001006</td><td>PSDM</td><td><span class="badge b-present">Hadir</span></td><td class="num mono">09:14:07</td></tr>
+            <tr><td>Siti Aminah</td><td class="mono">1232001012</td><td>Humas</td><td><span class="badge b-present">Hadir</span></td><td class="num mono">09:14:31</td></tr>
+            <tr><td>Andi Pratama</td><td class="mono">1212001004</td><td>Acara</td><td><span class="badge b-fallback">Cadangan</span></td><td class="num mono">09:15:02</td></tr>
+            <tr><td>Dewi Lestari</td><td class="mono">1202721002</td><td>Dana Usaha</td><td><span class="badge b-absent">Tidak Hadir</span></td><td class="num muted">-</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANGGOTA -->
+    <section class="screen" id="s-members">
+      <div class="card">
+        <div class="card-head"><h3>Kelola Anggota</h3><button class="btn btn-primary btn-sm">Tambah Anggota</button></div>
+        <div class="table-scroll">
+        <table>
+          <thead><tr><th>Nama</th><th>Email</th><th>Divisi</th><th>Peran</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><b>Admin Sistem</b></td><td class="muted">admin@ormawa.bakrie.ac.id</td><td>IT/PSDM</td><td>Admin</td><td><span class="badge b-present">Aktif</span></td></tr>
+            <tr><td><b>Rafi Ibnusalis</b></td><td class="muted">panitia@student.bakrie.ac.id</td><td>Sie Acara</td><td>Panitia</td><td><span class="badge b-present">Aktif</span></td></tr>
+            <tr><td><b>Siti Aminah</b></td><td class="muted">anggota@student.bakrie.ac.id</td><td>Humas</td><td>Anggota</td><td><span class="badge b-present">Aktif</span></td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- EMAIL -->
+    <section class="screen" id="s-mail">
+      <div class="grid col-3" style="margin-bottom:16px">
+        <div class="kpi"><div class="lab">Terkirim</div><div class="val">0</div></div>
+        <div class="kpi"><div class="lab">Mode Log</div><div class="val">12</div></div>
+        <div class="kpi"><div class="lab">Gagal</div><div class="val">0</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Outbox</h3><span class="chip">200 terakhir</span></div>
+        <div class="table-scroll">
+        <table>
+          <thead><tr><th>Waktu</th><th>Penerima</th><th>Subjek</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="mono muted">10/05 08:12</td><td class="muted">anggota@student.bakrie.ac.id</td><td><b>Acara baru: Seminar Nasional Kepemimpinan</b><div class="sub">acara_baru</div></td><td><span class="badge b-muted">log</span></td></tr>
+            <tr><td class="mono muted">10/05 08:10</td><td class="muted">pembina@ormawa.bakrie.ac.id</td><td><b>Proposal diajukan</b><div class="sub">proposal</div></td><td><span class="badge b-muted">log</span></td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUDIT -->
+    <section class="screen" id="s-audit">
+      <div class="card">
+        <div class="card-head"><h3>Log Audit</h3></div>
+        <div class="table-scroll">
+        <table>
+          <thead><tr><th>Waktu</th><th>Pelaku</th><th>Aksi</th><th>Entitas</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr><td class="mono muted">10/05 19:56</td><td>Budi Santoso</td><td class="mono">event_status</td><td class="muted">event #20</td><td>Ubah status ke berlangsung</td></tr>
+            <tr><td class="mono muted">10/05 19:41</td><td>Rafi Ibnusalis</td><td class="mono">presensi</td><td class="muted">attendance #12</td><td>Presensi Andi Pratama via qr</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+const TITLES = {
+  login:'Masuk', dashboard:'Dasbor', events:'Acara', notif:'Notifikasi',
+  scan:'Scan Presensi', form:'Buat Acara', proposal:'Proposal', report:'Laporan',
+  members:'Anggota', mail:'Email', audit:'Audit'
+};
+function toggleNav(){ document.body.classList.toggle('nav-open'); }
+const nav = document.querySelectorAll('.nav-a');
+const screens = document.querySelectorAll('.screen');
+nav.forEach(a => a.addEventListener('click', () => {
+  const key = a.dataset.s;
+  nav.forEach(x => x.classList.remove('active'));
+  a.classList.add('active');
+  screens.forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('s-' + key);
+  if (el) el.classList.add('active');
+  document.getElementById('page-title').textContent = TITLES[key] || '';
+  document.getElementById('appbar-title').textContent = TITLES[key] || '';
+  document.body.classList.remove('nav-open');
+  window.scrollTo({top:0, behavior:'smooth'});
+}));
+</script>
+</body>
+</html>
